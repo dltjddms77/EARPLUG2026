@@ -59,9 +59,9 @@
           <div>
             <img id="adminPoster" class="poster-admin" style="display:none" alt="포스터" />
             <div class="field">
-              <label for="posterFile">포스터 업로드 (JPG/PNG)</label>
-              <input type="file" id="posterFile" accept="image/*" />
-              <p class="hint">파일 선택 후 아래 ‘저장’을 누르면 반영됩니다.</p>
+              <label for="fPosterUrl">포스터 이미지 주소(URL)</label>
+              <input type="text" id="fPosterUrl" placeholder="poster.jpg 또는 https://..." />
+              <p class="hint">GitHub에 올린 이미지면 파일명(예: <code>poster.jpg</code>)만 적어도 됩니다.</p>
             </div>
           </div>
           <div>
@@ -70,11 +70,10 @@
               <input type="text" id="fSiteName" placeholder="예: PLUGROUND" />
             </div>
             <div class="field">
-              <label for="fLogoFile">로고 이미지 (선택)</label>
+              <label for="fLogoUrl">로고 이미지 주소(URL, 선택)</label>
               <img id="logoPreview" alt="로고" style="display:none;height:34px;margin-bottom:8px" />
-              <input type="file" id="fLogoFile" accept="image/*" />
-              <button type="button" class="btn ghost sm" id="removeLogoBtn" style="margin-top:8px;display:none">로고 이미지 제거</button>
-              <p class="hint">이미지를 올리면 글자 대신 로고가 표시됩니다. 비우면 위의 사이트 이름이 로고로 쓰입니다.</p>
+              <input type="text" id="fLogoUrl" placeholder="logo.png 또는 https://... (비우면 글자 로고)" />
+              <p class="hint">주소를 넣으면 글자 대신 로고 이미지가 표시됩니다. 비우면 위의 사이트 이름이 로고로 쓰입니다.</p>
             </div>
             <div class="field">
               <label for="fTitle">공연 제목</label>
