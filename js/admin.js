@@ -109,7 +109,29 @@ function renderBlocks() {
     if (b.type === "heading") {
       body = `<input type="text" data-f="text" placeholder="소제목" value="${attr(b.text)}" />`;
     } else if (b.type === "text") {
-      body = `<textarea data-f="text" placeholder="본문 내용을 입력하세요">${esc(b.text)}</textarea>`;
+      body = `
+        <div class="richtext-toolbar">
+          <button type="button" data-cmd="bold" title="굵게"><b>B</b></button>
+          <button type="button" data-cmd="italic" title="기울임"><i>I</i></button>
+          <button type="button" data-cmd="underline" title="밑줄"><u>U</u></button>
+          <button type="button" data-cmd="strikeThrough" title="취소선"><s>S</s></button>
+          <span class="sep"></span>
+          <label>크기
+            <select data-size title="글자 크기">
+              <option value="1">소</option>
+              <option value="3" selected>중</option>
+              <option value="5">대</option>
+              <option value="7">특대</option>
+            </select>
+          </label>
+          <label title="글자 색상">색상 <input type="color" data-color value="#1a1a1a" /></label>
+          <span class="sep"></span>
+          <button type="button" data-link title="하이퍼링크 삽입">🔗 링크</button>
+          <button type="button" data-unlink title="링크 제거">⛓ 해제</button>
+          <span class="sep"></span>
+          <button type="button" data-cmd="removeFormat" title="서식 모두 지우기">✕ 서식 초기화</button>
+        </div>
+        <div class="richtext-body" contenteditable="true">${b.text || ""}</div>`;
     } else if (b.type === "video") {
       body = `<input type="text" data-f="url" placeholder="https://youtu.be/..." value="${attr(b.url)}" />`;
     } else if (b.type === "image") {
@@ -128,7 +150,7 @@ function renderBlocks() {
       </div>
       <div class="block-body">${body}</div>`;
 
-    // 입력 반영
+    // 입력 반영 (heading / image / video)
     card.querySelectorAll("[data-f]").forEach((el) => {
       const f = el.dataset.f;
       el.addEventListener("input", () => { b[f] = el.value; });
@@ -136,6 +158,61 @@ function renderBlocks() {
         el.addEventListener("change", () => renderBlocks());
       }
     });
+
+    // 리치 텍스트 에디터 (text 블록 전용)
+    if (b.type === "text") {
+      const editor = card.querySelector(".richtext-body");
+
+      // 내용 동기화
+      editor.addEventListener("input", () => { b.text = editor.innerHTML; });
+
+      // 서식 버튼 (bold / italic / underline / strikeThrough / removeFormat)
+      card.querySelectorAll("[data-cmd]").forEach((btn) => {
+        btn.addEventListener("mousedown", (e) => {
+          e.preventDefault();
+          document.execCommand(btn.dataset.cmd, false, null);
+          editor.focus();
+        });
+      });
+
+      // 글자 크기
+      const sizeSelect = card.querySelector("[data-size]");
+      sizeSelect?.addEventListener("change", () => {
+        document.execCommand("fontSize", false, sizeSelect.value);
+        editor.focus();
+      });
+
+      // 글자 색상
+      const colorInput = card.querySelector("[data-color]");
+      colorInput?.addEventListener("input", () => {
+        document.execCommand("foreColor", false, colorInput.value);
+        editor.focus();
+      });
+
+      // 하이퍼링크 삽입
+      card.querySelector("[data-link]")?.addEventListener("mousedown", (e) => {
+        e.preventDefault();
+        const url = prompt("링크 주소를 입력하세요:", "https://");
+        if (url && url !== "https://") {
+          document.execCommand("createLink", false, url);
+          editor.querySelectorAll("a").forEach((a) => {
+            a.target = "_blank";
+            a.rel = "noopener noreferrer";
+          });
+          b.text = editor.innerHTML;
+        }
+        editor.focus();
+      });
+
+      // 링크 제거
+      card.querySelector("[data-unlink]")?.addEventListener("mousedown", (e) => {
+        e.preventDefault();
+        document.execCommand("unlink", false, null);
+        b.text = editor.innerHTML;
+        editor.focus();
+      });
+    }
+
     // 컨트롤
     card.querySelector("[data-rm]").addEventListener("click", () => {
       blocks.splice(i, 1); renderBlocks();
@@ -237,7 +314,12 @@ $("saveInfo").addEventListener("click", async () => {
         if (b.type === "video") return { type: "video", url: (b.url || "").trim() };
         return { type: b.type, text: b.text || "" };
       })
-      .filter((b) => (b.type === "image" || b.type === "video") ? b.url : b.text);
+      .filter((b) => {
+        if (b.type === "image" || b.type === "video") return b.url;
+        // text 블록은 HTML 태그를 제거한 실제 텍스트가 있어야 저장
+        const plain = String(b.text || "").replace(/<[^>]*>/g, "").replace(/&nbsp;/g, "").trim();
+        return plain.length > 0;
+      });
 
     const data = {
       title: $("fTitle").value.trim(),

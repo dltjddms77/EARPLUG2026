@@ -43,7 +43,7 @@ function renderContent(blocks) {
   if (!Array.isArray(blocks) || !blocks.length) return;
   const html = blocks.map((b) => {
     if (b.type === "heading" && b.text) return '<h2 class="content-h">' + esc(b.text) + "</h2>";
-    if (b.type === "text" && b.text) return '<p class="content-p">' + esc(b.text) + "</p>";
+    if (b.type === "text" && b.text) return '<div class="content-p">' + b.text + "</div>";
     if (b.type === "image" && b.url) return '<img class="content-img" src="' + esc(b.url) + '" alt="" />';
     if (b.type === "video") {
       const e = toYouTubeEmbed(b.url);
