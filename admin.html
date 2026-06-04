@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>관리자 · STAGE</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" id="brand" href="index.html">STAGE<span>.</span></a>
+      <a class="nav-link" href="index.html">← 공개 페이지</a>
+    </div>
+  </header>
+
+  <!-- 로그인 화면 -->
+  <div id="loginView">
+    <div class="login-card">
+      <h1>관리자 로그인</h1>
+      <p>등록된 관리자 계정만 접근할 수 있습니다.</p>
+      <div class="notice err" id="loginErr"></div>
+      <form id="loginForm">
+        <div class="field">
+          <label for="email">이메일</label>
+          <input type="email" id="email" required autocomplete="username" />
+        </div>
+        <div class="field">
+          <label for="pw">비밀번호</label>
+          <input type="password" id="pw" required autocomplete="current-password" />
+        </div>
+        <button type="submit" class="btn" style="width:100%">로그인</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 대시보드 -->
+  <div id="dashView" class="admin-shell" style="display:none">
+    <div class="wrap">
+      <div class="admin-head">
+        <div>
+          <h1 style="font-family:var(--serif);font-size:1.8rem">관리자 대시보드</h1>
+          <span class="who" id="whoami"></span>
+        </div>
+        <button class="btn ghost sm" id="logoutBtn">로그아웃</button>
+      </div>
+
+      <div class="admin-tabs">
+        <button data-tab="info" class="active">공연 정보</button>
+        <button data-tab="apps">신청자 명부</button>
+        <button data-tab="admins">관리자</button>
+      </div>
+
+      <!-- 공연 정보 패널 -->
+      <section class="panel active" id="panel-info">
+        <div class="notice ok" id="infoOk">저장되었습니다.</div>
+        <div class="notice err" id="infoErr"></div>
+        <div class="hero-grid" style="gap:40px">
+          <div>
+            <img id="adminPoster" class="poster-admin" style="display:none" alt="포스터" />
+            <div class="field">
+              <label for="posterFile">포스터 업로드 (JPG/PNG)</label>
+              <input type="file" id="posterFile" accept="image/*" />
+              <p class="hint">파일 선택 후 아래 ‘저장’을 누르면 반영됩니다.</p>
+            </div>
+          </div>
+          <div>
+            <div class="field">
+              <label for="fSiteName">사이트 이름 (로고 글자)</label>
+              <input type="text" id="fSiteName" placeholder="예: PLUGROUND" />
+            </div>
+            <div class="field">
+              <label for="fLogoFile">로고 이미지 (선택)</label>
+              <img id="logoPreview" alt="로고" style="display:none;height:34px;margin-bottom:8px" />
+              <input type="file" id="fLogoFile" accept="image/*" />
+              <button type="button" class="btn ghost sm" id="removeLogoBtn" style="margin-top:8px;display:none">로고 이미지 제거</button>
+              <p class="hint">이미지를 올리면 글자 대신 로고가 표시됩니다. 비우면 위의 사이트 이름이 로고로 쓰입니다.</p>
+            </div>
+            <div class="field">
+              <label for="fTitle">공연 제목</label>
+              <input type="text" id="fTitle" />
+            </div>
+            <div class="field">
+              <label for="fDate">일시</label>
+              <input type="text" id="fDate" placeholder="2026년 7월 4일 (토) 오후 7시" />
+            </div>
+            <div class="field">
+              <label for="fLocation">장소</label>
+              <input type="text" id="fLocation" />
+            </div>
+            <div class="field">
+              <label for="fPrice">관람료</label>
+              <input type="text" id="fPrice" placeholder="₩10,000 (비워두면 표시되지 않음)" />
+            </div>
+            <div class="field">
+              <label for="fDesc">공연 소개 (요약)</label>
+              <textarea id="fDesc" style="min-height:120px"></textarea>
+              <p class="hint">포스터 옆에 보이는 짧은 소개입니다.</p>
+            </div>
+            <div class="field">
+              <label><input type="checkbox" id="fOpen" style="width:auto;margin-right:8px" />참석 신청 받는 중</label>
+              <p class="hint">체크를 해제하면 공개 페이지에서 신청이 마감됩니다.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 블로그식 상세 내용 편집기 -->
+        <div class="editor-head">
+          <h3 class="editor-title">상세 내용 (블로그)</h3>
+          <p class="hint">소제목 · 본문 · 유튜브 · 이미지를 자유롭게 추가하고 순서를 바꿔 페이지를 구성하세요. 공개 페이지의 ‘참석 신청’ 바로 위에 그대로 표시됩니다.</p>
+        </div>
+        <div id="blocks" class="blocks"></div>
+        <div class="add-block-bar">
+          <button type="button" class="btn ghost sm" data-add="heading">+ 소제목</button>
+          <button type="button" class="btn ghost sm" data-add="text">+ 본문</button>
+          <button type="button" class="btn ghost sm" data-add="video">+ 유튜브</button>
+          <button type="button" class="btn ghost sm" data-add="image">+ 이미지</button>
+        </div>
+
+        <div style="margin-top:28px">
+          <button class="btn" id="saveInfo">전체 저장</button>
+        </div>
+      </section>
+
+      <!-- 신청자 명부 패널 -->
+      <section class="panel" id="panel-apps">
+        <div class="stat-row">
+          <div class="stat"><div class="n" id="statApps">0</div><div class="l">신청 건수</div></div>
+          <div class="stat"><div class="n" id="statPeople">0</div><div class="l">총 인원</div></div>
+        </div>
+        <div class="toolbar">
+          <button class="btn ghost sm" id="refreshApps">새로고침</button>
+          <button class="btn ghost sm" id="exportCsv">CSV 내보내기</button>
+        </div>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr><th>#</th><th>대표 신청자</th><th>연락처</th><th>전체 명단</th><th>인원</th><th>메모</th><th>신청일시</th><th></th></tr>
+            </thead>
+            <tbody id="appsBody">
+              <tr><td colspan="8" class="empty-state">불러오는 중…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 관리자 패널 -->
+      <section class="panel" id="panel-admins">
+        <p class="section-sub">관리자 권한을 가진 계정 목록입니다. 새 관리자는 먼저 로그인 화면에서 계정이 만들어져 있어야 하며, 아래에 UID를 추가하면 권한이 부여됩니다. (UID 확인 방법은 README 참고)</p>
+        <div class="notice ok" id="admOk"></div>
+        <div class="notice err" id="admErr"></div>
+        <div class="toolbar">
+          <input type="text" id="newAdminUid" class="grow" placeholder="추가할 관리자 UID" style="padding:10px 14px;border:1px solid var(--line);border-radius:4px" />
+          <input type="text" id="newAdminEmail" placeholder="이메일(메모용)" style="padding:10px 14px;border:1px solid var(--line);border-radius:4px" />
+          <button class="btn sm" id="addAdminBtn">추가</button>
+        </div>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th>UID</th><th>이메일</th><th></th></tr></thead>
+            <tbody id="adminsBody"><tr><td colspan="3" class="empty-state">불러오는 중…</td></tr></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script type="module" src="js/admin.js"></script>
+</body>
+</html>

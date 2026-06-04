@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>공연 안내 · 예매</title>
+  <meta name="description" content="공연 정보와 참석 신청" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" id="brand" href="index.html">STAGE<span>.</span></a>
+      <a class="nav-link" href="#apply">참석 신청 ↓</a>
+    </div>
+  </header>
+
+  <main>
+    <!-- 공연 소개 -->
+    <section class="hero">
+      <div class="wrap hero-grid">
+        <div class="poster-frame">
+          <img id="poster" alt="공연 포스터" style="display:none" />
+          <div class="poster-empty" id="posterEmpty">포스터 준비 중입니다</div>
+        </div>
+        <div>
+          <p class="eyebrow">LIVE PERFORMANCE</p>
+          <h1 class="title" id="title">공연 정보를 불러오는 중…</h1>
+          <div class="meta">
+            <div class="meta-row"><span class="k">일시</span><span class="v" id="date">—</span></div>
+            <div class="meta-row"><span class="k">장소</span><span class="v" id="location">—</span></div>
+            <div class="meta-row" id="priceRow" style="display:none"><span class="k">관람료</span><span class="v" id="price">—</span></div>
+          </div>
+          <p class="desc" id="desc"></p>
+          <a class="btn accent" href="#apply">참석 신청하기</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- 상세 내용 (관리자가 자유롭게 구성) -->
+    <section class="section" id="contentSection" style="display:none">
+      <div class="wrap">
+        <div id="contentBlocks" class="content-blocks"></div>
+      </div>
+    </section>
+
+    <!-- 신청 폼 -->
+    <section class="section" id="apply">
+      <div class="wrap">
+        <h2 class="section-title">참석 신청</h2>
+        <p class="section-sub">아래 정보를 입력해 주세요. 동반자가 있다면 함께 오시는 분의 이름도 모두 적어주세요.</p>
+
+        <div class="form-card">
+          <div class="notice ok" id="okMsg">신청이 완료되었습니다. 감사합니다!</div>
+          <div class="notice err" id="errMsg"></div>
+          <div id="closedBox" class="closed-banner" style="display:none">현재 신청이 마감되었습니다.</div>
+
+          <form id="applyForm">
+            <div class="field">
+              <label for="name">대표 신청자 이름</label>
+              <input type="text" id="name" required autocomplete="name" />
+            </div>
+            <div class="field">
+              <label for="contact">연락처</label>
+              <input type="text" id="contact" required placeholder="010-0000-0000" autocomplete="tel" />
+            </div>
+            <div class="field">
+              <label>함께 오시는 분 (동반자)</label>
+              <div id="companions"></div>
+              <button type="button" class="add-link" id="addCompanion">+ 동반자 추가</button>
+              <p class="hint">대표 신청자 본인은 적지 않으셔도 됩니다. 동반자 인원만 추가해 주세요.</p>
+            </div>
+            <div class="field">
+              <label for="note">남길 말 (선택)</label>
+              <textarea id="note" placeholder="요청사항이 있다면 적어주세요"></textarea>
+            </div>
+            <button type="submit" class="btn" id="submitBtn">신청 제출</button>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">© <span id="year"></span> <span id="brandFoot">STAGE</span> · 본 페이지는 공연 참석 신청용입니다.</div>
+  </footer>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

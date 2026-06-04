@@ -1,0 +1,37 @@
+rules_version = '2';
+
+// ============================================================
+//  Firestore 보안 규칙
+//  핵심: 공연 정보는 누구나 읽기 가능 / 신청은 누구나 작성 가능,
+//        하지만 명부 열람·정보 수정·관리자 관리는 관리자만.
+//  Firebase 콘솔 → Firestore Database → "규칙" 탭에 붙여넣고 게시하세요.
+// ============================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // 로그인한 사용자의 uid가 admins 컬렉션에 등록되어 있으면 관리자
+    function isAdmin() {
+      return request.auth != null
+        && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    // 공연 정보: 모두 읽기 가능, 관리자만 수정
+    match /config/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // 신청 데이터: 누구나 새 신청 작성 가능 / 열람·수정·삭제는 관리자만
+    match /applications/{docId} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+
+    // 관리자 명단: 관리자만 읽고 쓸 수 있음
+    // (최초 관리자 1명은 콘솔에서 직접 추가해야 합니다 — README 참고)
+    match /admins/{uid} {
+      allow read, write: if isAdmin();
+    }
+  }
+}

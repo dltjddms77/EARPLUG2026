@@ -1,0 +1,19 @@
+rules_version = '2';
+
+// ============================================================
+//  Storage 보안 규칙 (포스터 이미지)
+//  포스터는 누구나 볼 수 있고, 업로드는 관리자만 가능.
+//  Firebase 콘솔 → Storage → "규칙" 탭에 붙여넣고 게시하세요.
+// ============================================================
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    // 포스터·상세 이미지·로고: 읽기는 공개, 업로드는 관리자만
+    match /{folder}/{fileName} {
+      allow read: if folder in ['posters', 'content', 'logos'];
+      allow write: if folder in ['posters', 'content', 'logos']
+        && request.auth != null
+        && firestore.exists(/databases/(default)/documents/admins/$(request.auth.uid));
+    }
+  }
+}
