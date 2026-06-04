@@ -10,19 +10,12 @@ import {
   getFirestore, doc, getDoc, setDoc, deleteDoc,
   collection, getDocs, query, orderBy,
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-import {
-  getStorage, ref, uploadBytes, getDownloadURL,
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-const storage = getStorage(app);
 const $ = (id) => document.getElementById(id);
 
-let pendingPosterFile = null;
-let pendingLogoFile = null;
-let removeLogo = false;
 let blocks = [];
 let blockSeq = 0;
 
@@ -120,9 +113,8 @@ function renderBlocks() {
     } else if (b.type === "video") {
       body = `<input type="text" data-f="url" placeholder="https://youtu.be/..." value="${attr(b.url)}" />`;
     } else if (b.type === "image") {
-      const prev = b.url || (b._file ? URL.createObjectURL(b._file) : "");
-      body = `${prev ? `<img class="block-img" src="${attr(prev)}" alt="" />` : ""}
-        <input type="file" data-f="file" accept="image/*" />`;
+      body = `${b.url ? `<img class="block-img" src="${attr(b.url)}" alt="" />` : ""}
+        <input type="text" data-f="url" placeholder="이미지 주소(URL)" value="${attr(b.url)}" />`;
     }
 
     card.innerHTML = `
@@ -139,13 +131,9 @@ function renderBlocks() {
     // 입력 반영
     card.querySelectorAll("[data-f]").forEach((el) => {
       const f = el.dataset.f;
-      if (f === "file") {
-        el.addEventListener("change", (e) => {
-          b._file = e.target.files[0] || null;
-          renderBlocks();
-        });
-      } else {
-        el.addEventListener("input", () => { b[f] = el.value; });
+      el.addEventListener("input", () => { b[f] = el.value; });
+      if (b.type === "image" && f === "url") {
+        el.addEventListener("change", () => renderBlocks());
       }
     });
     // 컨트롤
@@ -184,22 +172,14 @@ function applyBrand(p) {
   }
 }
 
-$("fLogoFile").addEventListener("change", (e) => {
-  pendingLogoFile = e.target.files[0] || null;
-  removeLogo = false;
-  if (pendingLogoFile) {
-    $("logoPreview").src = URL.createObjectURL(pendingLogoFile);
+$("fLogoUrl").addEventListener("input", () => {
+  const v = $("fLogoUrl").value.trim();
+  if (v) {
+    $("logoPreview").src = v;
     $("logoPreview").style.display = "block";
-    $("removeLogoBtn").style.display = "inline-flex";
+  } else {
+    $("logoPreview").style.display = "none";
   }
-});
-
-$("removeLogoBtn").addEventListener("click", () => {
-  pendingLogoFile = null;
-  removeLogo = true;
-  $("fLogoFile").value = "";
-  $("logoPreview").style.display = "none";
-  $("removeLogoBtn").style.display = "none";
 });
 
 // ---------- 공연 정보 ----------
@@ -210,11 +190,11 @@ async function loadInfo() {
       const p = snap.data();
       $("fTitle").value = p.title || "";
       $("fSiteName").value = p.siteName || "";
+      $("fLogoUrl").value = p.logoUrl || "";
       applyBrand(p);
       if (p.logoUrl) {
         $("logoPreview").src = p.logoUrl;
         $("logoPreview").style.display = "block";
-        $("removeLogoBtn").style.display = "inline-flex";
       }
       $("fDate").value = p.date || "";
       $("fLocation").value = p.location || "";
@@ -223,6 +203,7 @@ async function loadInfo() {
       $("fOpen").checked = p.applyOpen !== false;
       blocks = Array.isArray(p.content) ? p.content.map(normalizeBlock) : [];
       renderBlocks();
+      $("fPosterUrl").value = p.posterUrl || "";
       if (p.posterUrl) {
         $("adminPoster").src = p.posterUrl;
         $("adminPoster").style.display = "block";
@@ -235,11 +216,13 @@ async function loadInfo() {
   } catch (e) { console.error(e); }
 }
 
-$("posterFile").addEventListener("change", (e) => {
-  pendingPosterFile = e.target.files[0] || null;
-  if (pendingPosterFile) {
-    $("adminPoster").src = URL.createObjectURL(pendingPosterFile);
+$("fPosterUrl").addEventListener("input", () => {
+  const v = $("fPosterUrl").value.trim();
+  if (v) {
+    $("adminPoster").src = v;
     $("adminPoster").style.display = "block";
+  } else {
+    $("adminPoster").style.display = "none";
   }
 });
 
@@ -247,23 +230,11 @@ $("saveInfo").addEventListener("click", async () => {
   const btn = $("saveInfo");
   btn.disabled = true; btn.textContent = "저장 중…";
   try {
-    // 1) 새로 추가된 이미지 블록 파일을 Storage에 업로드
-    for (const b of blocks) {
-      if (b.type === "image" && b._file) {
-        const path = "content/img_" + Date.now() + "_" + b._file.name;
-        const sref = ref(storage, path);
-        await uploadBytes(sref, b._file);
-        b.url = await getDownloadURL(sref);
-        b.path = path;
-        delete b._file;
-      }
-    }
-
-    // 2) 저장용 블록 배열 정리 (내부용 필드 제거)
+    // 저장용 블록 배열 정리 (빈 블록 제외)
     const content = blocks
       .map((b) => {
-        if (b.type === "image") return { type: "image", url: b.url || "", path: b.path || "" };
-        if (b.type === "video") return { type: "video", url: b.url || "" };
+        if (b.type === "image") return { type: "image", url: (b.url || "").trim() };
+        if (b.type === "video") return { type: "video", url: (b.url || "").trim() };
         return { type: b.type, text: b.text || "" };
       })
       .filter((b) => (b.type === "image" || b.type === "video") ? b.url : b.text);
@@ -271,6 +242,8 @@ $("saveInfo").addEventListener("click", async () => {
     const data = {
       title: $("fTitle").value.trim(),
       siteName: $("fSiteName").value.trim(),
+      logoUrl: $("fLogoUrl").value.trim(),
+      posterUrl: $("fPosterUrl").value.trim(),
       date: $("fDate").value.trim(),
       location: $("fLocation").value.trim(),
       price: $("fPrice").value.trim(),
@@ -278,32 +251,6 @@ $("saveInfo").addEventListener("click", async () => {
       applyOpen: $("fOpen").checked,
       content,
     };
-
-    // 포스터 업로드
-    if (pendingPosterFile) {
-      const path = "posters/poster_" + Date.now() + "_" + pendingPosterFile.name;
-      const storageRef = ref(storage, path);
-      await uploadBytes(storageRef, pendingPosterFile);
-      data.posterUrl = await getDownloadURL(storageRef);
-      data.posterPath = path;
-      pendingPosterFile = null;
-      $("posterFile").value = "";
-    }
-
-    // 로고 업로드 / 제거
-    if (pendingLogoFile) {
-      const path = "logos/logo_" + Date.now() + "_" + pendingLogoFile.name;
-      const lref = ref(storage, path);
-      await uploadBytes(lref, pendingLogoFile);
-      data.logoUrl = await getDownloadURL(lref);
-      data.logoPath = path;
-      pendingLogoFile = null;
-      $("fLogoFile").value = "";
-    } else if (removeLogo) {
-      data.logoUrl = "";
-      data.logoPath = "";
-      removeLogo = false;
-    }
 
     await setDoc(doc(db, PERFORMANCE_DOC), data, { merge: true });
     applyBrand(data);
