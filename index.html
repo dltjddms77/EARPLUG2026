@@ -18,19 +18,21 @@
   <main>
     <!-- 공연 소개 -->
     <section class="hero">
-      <div class="wrap hero-grid">
+      <div class="wrap hero-shell">
         <div class="poster-frame">
           <img id="poster" alt="공연 포스터" style="display:none" />
           <div class="poster-empty" id="posterEmpty">포스터 준비 중입니다</div>
         </div>
-        <div>
+        <div class="hero-head">
           <p class="eyebrow">LIVE PERFORMANCE</p>
           <h1 class="title" id="title">공연 정보를 불러오는 중…</h1>
-          <div class="meta">
-            <div class="meta-row"><span class="k">일시</span><span class="v" id="date">—</span></div>
-            <div class="meta-row"><span class="k">장소</span><span class="v" id="location">—</span></div>
-            <div class="meta-row" id="priceRow" style="display:none"><span class="k">관람료</span><span class="v" id="price">—</span></div>
-          </div>
+        </div>
+        <div class="meta">
+          <div class="meta-row"><span class="k">일시</span><span class="v" id="date">—</span></div>
+          <div class="meta-row"><span class="k">장소</span><span class="v" id="location">—</span></div>
+          <div class="meta-row" id="priceRow" style="display:none"><span class="k">관람료</span><span class="v" id="price">—</span></div>
+        </div>
+        <div class="hero-foot">
           <p class="desc" id="desc"></p>
           <a class="btn accent" href="#apply">참석 신청하기</a>
         </div>
