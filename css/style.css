@@ -483,8 +483,101 @@ tr:last-child td { border-bottom: none; }
 }
 
 /* ---------- 반응형 ---------- */
+
+/* 태블릿 이하 (820px) */
 @media (max-width: 820px) {
-  .hero-grid { grid-template-columns: 1fr; gap: 36px; }
-  .poster-frame { max-width: 360px; }
-  .form-card { padding: 24px; }
+  .hero { padding: 48px 0 36px; }
+  .hero-grid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+  .poster-frame { max-width: 320px; }
+  .form-card { padding: 28px; }
+  .admin-shell { padding: 36px 0; }
+}
+
+/* 모바일 (640px 이하) */
+@media (max-width: 640px) {
+  /* 헤더 */
+  .site-header .wrap {
+    padding-top: 14px;
+    padding-bottom: 14px;
+  }
+  .brand { font-size: 1.1rem; }
+
+  /* 히어로 */
+  .hero { padding: 28px 0 24px; }
+  .hero-grid { gap: 24px; }
+
+  /* 모바일에서 포스터를 제목 아래로 */
+  .hero-grid .poster-frame { order: 2; }
+  .hero-grid > div:last-child { order: 1; }
+
+  .poster-frame { max-width: 200px; }
+  .eyebrow { font-size: 0.72rem; margin-bottom: 12px; }
+  .title { font-size: clamp(1.7rem, 8vw, 2.4rem); margin-bottom: 20px; }
+
+  .meta-row { gap: 12px; padding: 11px 2px; }
+  .meta-row .k { width: 52px; font-size: 0.72rem; }
+  .meta-row .v { font-size: 0.92rem; }
+
+  .desc { font-size: 0.92rem; margin-bottom: 24px; }
+  .btn { padding: 13px 22px; font-size: 0.9rem; }
+  .btn.accent { width: 100%; justify-content: center; }
+
+  /* 상세 콘텐츠 */
+  .section { padding: 32px 0; }
+  .content-blocks { max-width: 100%; }
+  .content-h { font-size: 1.25rem; margin: 24px 0 10px; }
+  .content-p { font-size: 0.95rem; }
+
+  /* 신청 폼 */
+  .section-title { font-size: 1.3rem; }
+  .section-sub { font-size: 0.88rem; margin-bottom: 22px; }
+  .form-card { padding: 20px 16px; }
+  .field { margin-bottom: 16px; }
+  .field input, .field textarea, .field select { padding: 11px 12px; font-size: 0.95rem; }
+
+  /* 푸터 */
+  .site-footer { padding: 24px 0; font-size: 0.78rem; }
+
+  /* 관리자 로그인 */
+  .login-card { margin: 32px auto; padding: 24px 20px; }
+
+  /* 관리자 대시보드 */
+  .admin-shell { padding: 24px 0; }
+  .admin-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .admin-head h1 { font-size: 1.4rem !important; }
+
+  /* 탭 */
+  .admin-tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    gap: 0;
+    margin-bottom: 24px;
+  }
+  .admin-tabs button { padding: 10px 14px; font-size: 0.88rem; white-space: nowrap; }
+
+  /* 블록 에디터 */
+  .block-card { padding: 10px 12px; }
+  .richtext-toolbar { gap: 3px; padding: 5px 6px; }
+  .richtext-toolbar button { padding: 4px 7px; font-size: 0.78rem; }
+  .richtext-toolbar select { font-size: 0.78rem; }
+
+  /* 통계 카드 */
+  .stat { padding: 14px 18px; }
+  .stat .n { font-size: 1.6rem; }
+
+  /* 테이블 폰트 */
+  table { font-size: 0.82rem; }
+  th, td { padding: 10px 12px; }
+
+  /* 툴바 */
+  .toolbar { gap: 8px; }
+  .toolbar .grow { width: 100%; }
 }
