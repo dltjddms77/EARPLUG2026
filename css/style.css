@@ -525,7 +525,7 @@ tr:last-child td { border-bottom: none; }
   /* ── 히어로: 제목(상단 전폭) / 포스터(좌) + 메타(우) / 설명+버튼(하단 전폭) ── */
   .hero { padding: 24px 0 20px; }
   .hero-shell {
-    grid-template-columns: 100px 1fr;
+    grid-template-columns: 140px 1fr;
     column-gap: 14px;
     row-gap: 12px;
     grid-template-areas:
