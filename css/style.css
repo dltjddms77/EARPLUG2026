@@ -522,30 +522,33 @@ tr:last-child td { border-bottom: none; }
   .site-header .wrap { padding-top: 14px; padding-bottom: 14px; }
   .brand { font-size: 1.1rem; }
 
-  /* ── 히어로: 제목(상단 전폭) / 포스터(좌) + 메타(우) / 설명+버튼(하단 전폭) ── */
+  /* ── 히어로: 제목 → 포스터(크게) → 메타 → 설명+버튼 (세로 스택) ── */
   .hero { padding: 24px 0 20px; }
   .hero-shell {
-    grid-template-columns: 140px 1fr;
-    column-gap: 14px;
-    row-gap: 12px;
+    grid-template-columns: 1fr;
+    column-gap: 0;
+    row-gap: 20px;
     grid-template-areas:
-      "head head"
-      "poster meta"
-      "foot foot";
+      "head"
+      "poster"
+      "meta"
+      "foot";
   }
 
   /* 제목 영역 */
-  .hero-head { padding-bottom: 4px; }
   .eyebrow { font-size: 0.7rem; margin-bottom: 8px; }
-  .title { font-size: clamp(1.5rem, 7.5vw, 2.2rem); margin-bottom: 0; }
+  .title { font-size: clamp(1.6rem, 7.5vw, 2.2rem); margin-bottom: 0; }
 
-  /* 포스터 (그리드 컬럼 너비로 제어) */
-  .hero-shell .poster-frame { max-width: none; }
+  /* 포스터 — 크게, 가운데 정렬 */
+  .hero-shell .poster-frame {
+    max-width: 280px;
+    margin: 0 auto;
+  }
 
-  /* 메타 — 폰트 소형화 */
-  .hero-shell .meta .meta-row { padding: 7px 0; gap: 8px; }
-  .hero-shell .meta .meta-row .k { width: 38px; font-size: 0.65rem; letter-spacing: 0.08em; }
-  .hero-shell .meta .meta-row .v { font-size: 0.8rem; line-height: 1.4; }
+  /* 메타 */
+  .hero-shell .meta .meta-row { padding: 10px 2px; gap: 14px; }
+  .hero-shell .meta .meta-row .k { width: 52px; font-size: 0.75rem; }
+  .hero-shell .meta .meta-row .v { font-size: 0.95rem; }
 
   /* 설명 + 버튼 영역 */
   .hero-foot .desc { font-size: 0.9rem; margin-bottom: 18px; }
