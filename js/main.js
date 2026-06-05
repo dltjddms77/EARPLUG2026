@@ -162,12 +162,13 @@ $("applyForm").addEventListener("submit", async (e) => {
 
     // 관리자 알림 이메일 발송 (3명)
     const mailParams = {
-      applicant_name: name,
-      contact:        contact,
-      attendees:      attendees.join(", "),
-      party_size:     attendees.length + "명",
-      note:           note || "없음",
-      submitted_at:   new Date().toLocaleString("ko-KR", { dateStyle: "long", timeStyle: "short" }),
+      name:         name,
+      email:        contact,
+      contact:      contact,
+      attendees:    attendees.join(", "),
+      party_size:   attendees.length,
+      note:         note || "없음",
+      submitted_at: new Date().toLocaleString("ko-KR", { dateStyle: "long", timeStyle: "short" }),
     };
     const recipients = [
       "kor7241389@naver.com",
