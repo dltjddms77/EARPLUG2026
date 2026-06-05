@@ -6,6 +6,9 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
 import {
   getFirestore, doc, getDoc, addDoc, collection, serverTimestamp,
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import emailjs from "https://cdn.jsdelivr.net/npm/@emailjs/browser@4/+esm";
+
+emailjs.init("Axt3Dj3Budy4wN_Rp");
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
