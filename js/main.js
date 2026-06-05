@@ -177,6 +177,7 @@ $("applyForm").addEventListener("submit", async (e) => {
       "kor7241389@naver.com",
       "epdiaz90@gmail.com",
       "jues0804@naver.com",
+      "earplug-hellb@naver.com",
     ];
     try {
       await Promise.all(
