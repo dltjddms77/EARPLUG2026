@@ -181,7 +181,7 @@ $("applyForm").addEventListener("submit", async (e) => {
     try {
       await Promise.all(
         recipients.map((to_email) =>
-          emailjs.send("service_s13xbbs", "template_7t0vy7d", { ...mailParams, to_email })
+          emailjs.send("service_42kuvir", "template_7t0vy7d", { ...mailParams, to_email })
         )
       );
     } catch (mailErr) {
