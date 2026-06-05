@@ -6,6 +6,9 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
 import {
   getFirestore, doc, getDoc, addDoc, collection, serverTimestamp,
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import emailjs from "https://cdn.jsdelivr.net/npm/@emailjs/browser@4/+esm";
+
+emailjs.init("Axt3Dj3Budy4wN_Rp");
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
@@ -131,6 +134,7 @@ $("applyForm").addEventListener("submit", async (e) => {
   e.preventDefault();
   const name = $("name").value.trim();
   const contact = $("contact").value.trim();
+  const applicantEmail = $("email").value.trim();
   const note = $("note").value.trim();
   const companions = [...document.querySelectorAll("#companions input")]
     .map((i) => i.value.trim())
@@ -150,6 +154,7 @@ $("applyForm").addEventListener("submit", async (e) => {
     await addDoc(collection(db, "applications"), {
       name,
       contact,
+      email: applicantEmail,
       companions,
       attendees,
       partySize: attendees.length,
@@ -159,6 +164,49 @@ $("applyForm").addEventListener("submit", async (e) => {
     $("applyForm").reset();
     $("companions").innerHTML = "";
     showNotice("ok");
+
+    // 관리자 알림 이메일 발송 (3명)
+    const mailParams = {
+      name:         name,
+      email:        contact,
+      contact:      contact,
+      attendees:    attendees.join(", "),
+      party_size:   attendees.length,
+      note:         note || "없음",
+      submitted_at: new Date().toLocaleString("ko-KR", { dateStyle: "long", timeStyle: "short" }),
+    };
+    const recipients = [
+      "kor7241389@naver.com",
+      "epdiaz90@gmail.com",
+      "jues0804@naver.com",
+      "earplug-hellb@naver.com",
+    ];
+    try {
+      await Promise.all(
+        recipients.map((to_email) =>
+          emailjs.send("service_42kuvir", "template_7t0vy7d", { ...mailParams, to_email })
+        )
+      );
+    } catch (mailErr) {
+      console.warn("알림 메일 발송 실패:", mailErr);
+    }
+
+    // 신청자 자동회신 (이메일 입력한 경우에만)
+    if (applicantEmail) {
+      try {
+        await emailjs.send("service_42kuvir", "template_pu3nxxq", {
+          name:         name,
+          contact:      contact,
+          attendees:    attendees.join(", "),
+          party_size:   attendees.length,
+          note:         note || "없음",
+          submitted_at: new Date().toLocaleString("ko-KR", { dateStyle: "long", timeStyle: "short" }),
+          to_email:     applicantEmail,
+        });
+      } catch (replyErr) {
+        console.warn("자동회신 발송 실패:", replyErr);
+      }
+    }
   } catch (err) {
     console.error(err);
     showNotice("err", "신청 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.");
