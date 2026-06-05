@@ -384,6 +384,7 @@ function renderApps() {
       <td>${i + 1}</td>
       <td>${esc(a.name)}</td>
       <td>${esc(a.contact)}</td>
+      <td>${esc(a.email || "—")}</td>
       <td>${esc(names)}</td>
       <td>${a.partySize || (a.attendees ? a.attendees.length : 1)}</td>
       <td>${esc(a.note || "")}</td>
