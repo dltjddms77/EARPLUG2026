@@ -159,6 +159,30 @@ $("applyForm").addEventListener("submit", async (e) => {
     $("applyForm").reset();
     $("companions").innerHTML = "";
     showNotice("ok");
+
+    // 관리자 알림 이메일 발송 (3명)
+    const mailParams = {
+      applicant_name: name,
+      contact:        contact,
+      attendees:      attendees.join(", "),
+      party_size:     attendees.length + "명",
+      note:           note || "없음",
+      submitted_at:   new Date().toLocaleString("ko-KR", { dateStyle: "long", timeStyle: "short" }),
+    };
+    const recipients = [
+      "kor7241389@naver.com",
+      "epdiaz90@gmail.com",
+      "jues0804@naver.com",
+    ];
+    try {
+      await Promise.all(
+        recipients.map((to_email) =>
+          emailjs.send("service_s13xbbs", "template_7t0vy7d", { ...mailParams, to_email })
+        )
+      );
+    } catch (mailErr) {
+      console.warn("알림 메일 발송 실패:", mailErr);
+    }
   } catch (err) {
     console.error(err);
     showNotice("err", "신청 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.");
