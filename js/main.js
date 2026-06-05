@@ -134,6 +134,7 @@ $("applyForm").addEventListener("submit", async (e) => {
   e.preventDefault();
   const name = $("name").value.trim();
   const contact = $("contact").value.trim();
+  const applicantEmail = $("email").value.trim();
   const note = $("note").value.trim();
   const companions = [...document.querySelectorAll("#companions input")]
     .map((i) => i.value.trim())
@@ -153,6 +154,7 @@ $("applyForm").addEventListener("submit", async (e) => {
     await addDoc(collection(db, "applications"), {
       name,
       contact,
+      email: applicantEmail,
       companions,
       attendees,
       partySize: attendees.length,
@@ -187,6 +189,23 @@ $("applyForm").addEventListener("submit", async (e) => {
       );
     } catch (mailErr) {
       console.warn("알림 메일 발송 실패:", mailErr);
+    }
+
+    // 신청자 자동회신 (이메일 입력한 경우에만)
+    if (applicantEmail) {
+      try {
+        await emailjs.send("service_42kuvir", "template_pu3nxxq", {
+          name:         name,
+          contact:      contact,
+          attendees:    attendees.join(", "),
+          party_size:   attendees.length,
+          note:         note || "없음",
+          submitted_at: new Date().toLocaleString("ko-KR", { dateStyle: "long", timeStyle: "short" }),
+          applicant_email: applicantEmail,
+        });
+      } catch (replyErr) {
+        console.warn("자동회신 발송 실패:", replyErr);
+      }
     }
   } catch (err) {
     console.error(err);
