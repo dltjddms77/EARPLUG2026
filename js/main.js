@@ -201,7 +201,7 @@ $("applyForm").addEventListener("submit", async (e) => {
           party_size:   attendees.length,
           note:         note || "없음",
           submitted_at: new Date().toLocaleString("ko-KR", { dateStyle: "long", timeStyle: "short" }),
-          applicant_email: applicantEmail,
+          to_email:     applicantEmail,
         });
       } catch (replyErr) {
         console.warn("자동회신 발송 실패:", replyErr);
