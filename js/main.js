@@ -181,14 +181,13 @@ $("applyForm").addEventListener("submit", async (e) => {
       "jues0804@naver.com",
       "earplug-hellb@naver.com",
     ];
-    try {
-      await Promise.all(
-        recipients.map((to_email) =>
-          emailjs.send("service_42kuvir", "template_7t0vy7d", { ...mailParams, to_email })
-        )
-      );
-    } catch (mailErr) {
-      console.warn("알림 메일 발송 실패:", mailErr);
+    for (const to_email of recipients) {
+      try {
+        await emailjs.send("service_42kuvir", "template_7t0vy7d", { ...mailParams, to_email });
+        console.log("알림 발송 성공:", to_email);
+      } catch (mailErr) {
+        console.warn("알림 발송 실패:", to_email, mailErr);
+      }
     }
 
     // 신청자 자동회신 (이메일 입력한 경우에만)
