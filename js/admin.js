@@ -7,7 +7,7 @@ import {
   getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged,
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import {
-  getFirestore, doc, getDoc, setDoc, deleteDoc,
+  getFirestore, doc, getDoc, setDoc, deleteDoc, updateDoc,
   collection, getDocs, query, orderBy,
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
@@ -389,11 +389,21 @@ function renderApps() {
       <td>${a.partySize || (a.attendees ? a.attendees.length : 1)}</td>
       <td>${esc(a.note || "")}</td>
       <td>${fmtDate(a.createdAt)}</td>
-      <td><button class="btn danger" data-del="${a.id}">삭제</button></td>
+      <td style="white-space:nowrap">
+        <button class="btn ghost sm" data-edit="${a.id}" style="margin-right:6px">수정</button>
+        <button class="btn danger" data-del="${a.id}">삭제</button>
+      </td>
     </tr>`;
   }).join("");
   $("statApps").textContent = appsCache.length;
   $("statPeople").textContent = totalPeople;
+
+  body.querySelectorAll("[data-edit]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const a = appsCache.find((x) => x.id === btn.dataset.edit);
+      if (a) openEditModal(a);
+    });
+  });
 
   body.querySelectorAll("[data-del]").forEach((btn) => {
     btn.addEventListener("click", async () => {
@@ -468,6 +478,51 @@ async function loadAdmins() {
     body.innerHTML = '<tr><td colspan="3" class="empty-state">불러오기 실패: ' + e.message + "</td></tr>";
   }
 }
+
+// ---------- 수정 모달 ----------
+let editTargetId = null;
+
+function openEditModal(a) {
+  editTargetId = a.id;
+  $("eName").value = a.name || "";
+  $("eContact").value = a.contact || "";
+  $("eEmail").value = a.email || "";
+  $("eAttendees").value = (a.attendees || [a.name]).join(", ");
+  $("eNote").value = a.note || "";
+  $("editModal").style.display = "flex";
+}
+
+$("editCancelBtn").addEventListener("click", () => {
+  $("editModal").style.display = "none";
+});
+
+$("editModal").addEventListener("click", (e) => {
+  if (e.target === $("editModal")) $("editModal").style.display = "none";
+});
+
+$("editSaveBtn").addEventListener("click", async () => {
+  if (!editTargetId) return;
+  const btn = $("editSaveBtn");
+  btn.disabled = true; btn.textContent = "저장 중…";
+  const attendees = $("eAttendees").value.split(",").map((s) => s.trim()).filter(Boolean);
+  const data = {
+    name: $("eName").value.trim(),
+    contact: $("eContact").value.trim(),
+    email: $("eEmail").value.trim(),
+    attendees,
+    partySize: attendees.length,
+    note: $("eNote").value.trim(),
+  };
+  try {
+    await updateDoc(doc(db, "applications", editTargetId), data);
+    $("editModal").style.display = "none";
+    await loadApps();
+  } catch (e) {
+    alert("저장 실패: " + e.message);
+  } finally {
+    btn.disabled = false; btn.textContent = "저장";
+  }
+});
 
 $("addAdminBtn").addEventListener("click", async () => {
   const uid = $("newAdminUid").value.trim();
